@@ -3,9 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using UnityEngine;
+
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEngine;
+#endif
 
 namespace Gitmanik.Logging
 {
@@ -23,6 +26,7 @@ namespace Gitmanik.Logging
         public static void Error(string message) => Common(LogLevel.ERROR, message);
         public static void Fatal(string message) => Common(LogLevel.FATAL, message);
 
+#if UNITY_EDITOR
         [OnOpenAsset(0)]
         private static bool Redirect(int _, int __) // Inspired by Fox.Huang Huang Wenye
         {
@@ -70,6 +74,7 @@ namespace Gitmanik.Logging
 
             return activeTextField.GetValue(consoleWindowInstance).ToString();
         }
+#endif
 
         private static void Common(LogLevel level, string message)
         {
