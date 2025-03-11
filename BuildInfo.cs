@@ -6,6 +6,7 @@ namespace Gitmanik.BaseCode
 {
     public class BuildInfo
     {
+        public static readonly string FilePath = "Assets/Resources/BuildInfo.txt";
         private static BuildInfo _instance;
         public static BuildInfo Instance
         {
@@ -19,17 +20,21 @@ namespace Gitmanik.BaseCode
             }
         }
 
-        public DateTime BuildTime { get; private set; }
         public string BuildDate { get; private set; }
 
         protected BuildInfo()
         {
+#if UNITY_EDITOR
+            if (!File.Exists(FilePath))
+            {
+                File.Create(FilePath);
+            }
+            BuildDate = "EditorBuild";
+            return;
+#endif
             var txt = (Resources.Load("BuildInfo") as TextAsset);
             BuildDate = txt.text.Trim();
 
-#if UNITY_EDITOR
-            BuildDate = "EditorBuild";
-#endif
         }
 
     }
@@ -41,7 +46,7 @@ namespace Gitmanik.BaseCode
 
         public void OnPreprocessBuild(UnityEditor.Build.Reporting.BuildReport report)
         {
-            using (BinaryWriter Writer = new BinaryWriter(File.Open("Assets/Resources/BuildInfo.txt", FileMode.OpenOrCreate | FileMode.Truncate)))
+            using (BinaryWriter Writer = new BinaryWriter(File.Open(BuildInfo.FilePath, FileMode.OpenOrCreate | FileMode.Truncate)))
             {
                 Writer.Write(DateTime.Now.ToString("dd/MM/yyyy"));
             }
